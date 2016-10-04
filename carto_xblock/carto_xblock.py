@@ -1,56 +1,60 @@
 """TO-DO: Write a description of what this XBlock is."""
 
 import pkg_resources
-
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer
 from xblock.fragment import Fragment
+from webob.response import Response
 
 
 class CartoXBlock(XBlock):
     """
-    TO-DO: document what your XBlock does.
+    XBlock holding an iframe showing a CartoDB map
     """
-
-    # Fields are defined on the class.  You can access them in your code as
-    # self.<fieldname>.
-
-    # TO-DO: delete count, and define your own fields.
-    count = Integer(
-        default=0, scope=Scope.user_state,
-        help="A simple counter, to show something happening",
-    )
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
-    # TO-DO: change this view to display your data your own way.
     def student_view(self, context=None):
         """
-        The primary view of the CartoXBlock, shown to students
+        The primary view of the TimelineXBlock, shown to students
         when viewing courses.
         """
-        html = self.resource_string("static/html/carto_xblock.html")
+        html = self.resource_string("static/html/carto.html")
         frag = Fragment(html.format(self=self))
-        frag.add_css(self.resource_string("static/css/carto_xblock.css"))
-        frag.add_javascript(self.resource_string("static/js/src/carto_xblock.js"))
-        frag.initialize_js('CartoXBlock')
+        frag.add_css_url(
+            self.runtime.local_resource_url(
+                self, 'public/css/carto_xblock.css'))
         return frag
 
-    # TO-DO: change this handler to perform your own actions.  You may need more
-    # than one handler, or you may not need any handlers at all.
-    @XBlock.json_handler
-    def increment_count(self, data, suffix=''):
+    def studio_view(self, context):
         """
-        An example handler, which increments the data.
+        Create a fragment used to display the edit view in the Studio.
         """
-        # Just to show data coming in...
-        assert data['hello'] == 'world'
+        html_str = pkg_resources.resource_string(__name__, "static/html/studio_view.html")
+        frag = Fragment(unicode(html_str).format(
+            display_name=self.display_name,
+            thumbnail_url=self.thumbnail_url,
+            display_description=self.display_description
+        ))
+        js_str = pkg_resources.resource_string(__name__, "public/js/carto_edit.js")
+        frag.add_javascript(unicode(js_str))
+        frag.initialize_js('StudioEdit')
 
-        self.count += 1
-        return {"count": self.count}
+        return frag
+
+    @XBlock.handler
+    def studio_submit(self, request, suffix=''):
+        """
+        Called when submitting the form in Studio.
+        """
+        data = request.POST
+        self.display_name = data['display_name']
+        self.display_description = data['display_description']
+        self.thumbnail_url = data['thumbnail']
+
+        return Response(json_body={'result': 'success'})
 
     # TO-DO: change this to create the scenarios you'd like to see in the
     # workbench while developing your XBlock.
@@ -60,12 +64,5 @@ class CartoXBlock(XBlock):
         return [
             ("CartoXBlock",
              """<carto_xblock/>
-             """),
-            ("Multiple CartoXBlock",
-             """<vertical_demo>
-                <carto_xblock/>
-                <carto_xblock/>
-                <carto_xblock/>
-                </vertical_demo>
-             """),
+             """)
         ]
