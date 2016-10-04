@@ -1,0 +1,9 @@
+/* CSS for CartoXBlock */
+
+.carto_xblock_block .count {
+    font-weight: bold;
+}
+
+.carto_xblock_block p {
+    cursor: pointer;
+}
