@@ -3,6 +3,7 @@
 import pkg_resources
 from xblock.core import XBlock
 from xblock.fragment import Fragment
+from xblock.fields import Scope, String
 from webob.response import Response
 
 
@@ -10,6 +11,11 @@ class CartoXBlock(XBlock):
     """
     XBlock holding an iframe showing a CartoDB map
     """
+    display_name = String(
+        display_name="Display Name",
+        default="Carto XBlock",
+        scopde=Scope.settings
+    )
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -32,7 +38,7 @@ class CartoXBlock(XBlock):
         """
         Create a fragment used to display the edit view in the Studio.
         """
-        html_str = pkg_resources.resource_string(__name__, "static/html/studio_view.html")
+        html_str = pkg_resources.resource_string(__name__, "static/html/carto_edit.html")
         frag = Fragment(unicode(html_str).format(
             display_name=self.display_name,
             thumbnail_url=self.thumbnail_url,
