@@ -14,7 +14,7 @@ class CartoXBlock(XBlock):
     display_name = String(
         display_name="Display Name",
         default="Carto XBlock",
-        scopde=Scope.settings
+        scope=Scope.settings
     )
 
     def resource_string(self, path):
