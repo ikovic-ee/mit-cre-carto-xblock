@@ -68,6 +68,7 @@ class CartoXBlock(XBlock):
         self.display_name = data['display_name']
         self.display_description = data['display_description']
         self.thumbnail_url = data['thumbnail']
+        self.embed_url = data['embed_url']
 
         return Response(json_body={'result': 'success'})
 
