@@ -17,6 +17,12 @@ class CartoXBlock(XBlock):
         scope=Scope.settings
     )
 
+    embed_url = String(
+        display_name="Embed URL",
+        default="https://exteng.carto.com/u/exteng-admin/builder/4105204d-e3b2-49cf-8386-4c0a5573f2a0/embed?state=%7B%22map%22%3A%7B%22center%22%3A%5B8.952036908213827%2C-79.53629493713379%5D%2C%22zoom%22%3A17%7D%7D",
+        scope=Scope.settings
+    )
+
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
@@ -28,7 +34,9 @@ class CartoXBlock(XBlock):
         when viewing courses.
         """
         html = self.resource_string("static/html/carto.html")
-        frag = Fragment(html.format(self=self))
+        frag = Fragment(html.format(
+            self=self,
+            embed_url=self.embed_url))
         frag.add_css_url(
             self.runtime.local_resource_url(
                 self, 'public/css/carto_xblock.css'))
@@ -42,7 +50,8 @@ class CartoXBlock(XBlock):
         frag = Fragment(unicode(html_str).format(
             display_name=self.display_name,
             thumbnail_url=self.thumbnail_url,
-            display_description=self.display_description
+            display_description=self.display_description,
+            embed_url=self.embed_url
         ))
         js_str = pkg_resources.resource_string(__name__, "public/js/carto_edit.js")
         frag.add_javascript(unicode(js_str))

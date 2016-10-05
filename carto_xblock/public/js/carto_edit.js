@@ -6,6 +6,7 @@ function StudioEdit(runtime, element) {
         data.append('display_name', $(element).find('input[name=display_name]').val());
         data.append('display_description', $(element).find('input[name=display_description]').val().trim());
         data.append('thumbnail', $(element).find('input[name=thumbnail]').val().trim());
+        data.append('embed_url', $(element).find('input[name=thumbnail]').val().trim());
 
         runtime.notify('save', {state: 'start'});
 
