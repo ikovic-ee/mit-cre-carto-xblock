@@ -1,12 +1,16 @@
 function StudioEdit(runtime, element) {
-    $(element).find('.save-button').bind('click', function () {
+
+    var $element = $(element);
+
+    $element.find('.save-button').bind('click', function () {
         var handlerUrl = runtime.handlerUrl(element, 'studio_submit');
 
         var data = new FormData();
-        data.append('display_name', $(element).find('input[name=display_name]').val());
-        data.append('display_description', $(element).find('input[name=display_description]').val().trim());
-        data.append('thumbnail', $(element).find('input[name=thumbnail]').val().trim());
-        data.append('embed_url', $(element).find('input[name=embed_url]').val().trim());
+        data.append('usage_id', $element.data('usage-id'));
+        data.append('display_name', $element.find('input[name=display_name]').val());
+        data.append('display_description', $element.find('input[name=display_description]').val().trim());
+        data.append('thumbnail', $element.find('input[name=thumbnail]')[0].files[0]);
+        data.append('embed_url', $element.find('input[name=embed_url]').val().trim());
 
         runtime.notify('save', {state: 'start'});
 
@@ -23,7 +27,7 @@ function StudioEdit(runtime, element) {
         });
     });
 
-    $(element).find('.cancel-button').bind('click', function () {
+    $element.find('.cancel-button').bind('click', function () {
         runtime.notify('cancel', {});
     });
 }
