@@ -5,9 +5,10 @@ from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, String
 from webob.response import Response
+from xblock_django.mixins import FileUploadMixin
 
 
-class CartoXBlock(XBlock):
+class CartoXBlock(XBlock, FileUploadMixin):
     """
     XBlock holding an iframe showing a CartoDB map
     """
@@ -49,7 +50,6 @@ class CartoXBlock(XBlock):
         html_str = pkg_resources.resource_string(__name__, "static/html/carto_edit.html")
         frag = Fragment(unicode(html_str).format(
             display_name=self.display_name,
-            thumbnail_url=self.thumbnail_url,
             display_description=self.display_description,
             embed_url=self.embed_url
         ))
@@ -67,8 +67,12 @@ class CartoXBlock(XBlock):
         data = request.POST
         self.display_name = data['display_name']
         self.display_description = data['display_description']
-        self.thumbnail_url = data['thumbnail']
         self.embed_url = data['embed_url']
+
+        block_id = data['usage_id']
+        if not isinstance(data['thumbnail'], basestring):
+            upload = data['thumbnail']
+            self.thumbnail_url = self.upload_to_s3('THUMBNAIL', upload.file, block_id, self.thumbnail_url)
 
         return Response(json_body={'result': 'success'})
 
